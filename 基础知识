@@ -145,5 +145,61 @@ tail和head命令：查看文本文件尾部和头部的信息，可自定义行
 复制：cp   例如 cp install.log 桌面/
  cp -rf  /etc 桌面 递归复制文件夹到桌面
 
+移动：mv
+ mv 桌面/1.txt .  把桌面上的1.txt剪切移动到当前目录 
+ 
+ 删除：rm   非常危险（慎用）
+rm -rf 1.txt  （不加rf会提示是否删除）
+rm -rf 桌面/etc 如果删除文件夹必须用加rf的递归方法
+
+创建：touch     空文本文件
+如果文本文件已经存在，则表示更新时间戳
+
+元数据属性：stat  
+stat 1.txt 查询当前目录下的1.txt的属性
+
+查看内容类型：file
+File是查看文件里面内容属于什么类型  file 1.txt
+
+文本编辑器：nano，vi
+ctrl +o保存  ctrl+x退出
+
+****************通配符：（通配文件名）
+ *：匹配任意长度的任意字符
+ ?:匹配任意单个字符
+      []:匹配指定字符范围内的任意单个字符，简化写法不区分大小写
+       [[:upper:]]：大写字母    [a-z]  [A-Z]
+       [[:lower:]]:小写字母      [a-z]
+       [[:alpha:]]:所有字母
+       [[:digit:]]：所有数字   [0-9]
+       [[:alnum:]]:字母+数字
+       [[:space:]]:空格
+       [[:punct:]]:标点符号 特殊字符
+     [^]:匹配指定字符范围外的任意单个字符
+     
+     
+ **********帮助命令 help  man  (详细见命令解释文档)     info 命令：获取在线文档
+Redhat官方文档
+www.redhat.com/docs
 
 
+
+*************系统管理类命令
+shutdown [参数]...时间(详细请见详细命令解释文档)
+reboot  init  halt  service   ...
+init 0  init 6（相当于reboot）
+
+service httpd start
+**********日期时间管理类命令
+date，hwclock(详细请见详细命令解释文档)
+用法：date [选项]... [+格式]
+date
+date +%F
+
+************其他命令  du  mkdir which  id  lscpu  等（详细请见命令解释文档或man ）
+创建目录 mkdir test    当前目录下创建文件夹test
+ du -sh  显示目录或者文件所占空间：
+s, --summarize	只分别计算命令列中每个参数所占的总用量
+ -h, --human-readable	以可读性较好的方式显示尺寸(例如：1K 234M 2G)
+ 
+ lscpu：查看CPU信息文本  （中间没空格）
