@@ -63,4 +63,96 @@ bbb:x:892:892::/home/bbb:/sbin/nologin
 uuu:x:732:0::/home/uuu:/sbin/nologin
 
 
+****************yum仓库的搭建和yum方式安装
+构建本地仓库
+①：创建repo仓库文件（其他repo文件进行转移到其他目录）
+②：编写配置文件
+③：确认挂载光盘或rpm包是否存在
+④：清除本地yum缓存  yum clean all
+⑤：创建元数据信息、建立缓存。yum makecache
 
+yum 是rpm程序包管理器的升级版
+优点：解决依赖关系（方便、快捷）
+原理：
+仓库配置文件：/etc/yum.repos.d/*.repo
+
+1：确定光盘是否被点亮
+
+2：配置本地YUM仓库客户端的仓库配置文件，配置文件的路径在/etc/yum.repos.d目录下
+①：进入目录，删除或移动无用的仓库配置文件
+cd /etc/yum.repos.d   cp CentOS-Media.repo ./local.repo    mkdir backup
+mv CentOS-* ./backup/
+
+②：开始配置，配置客户端仓库配置文件，如下所示
+先touch一个文件如下名字的，再写入下面内容
+nano local.repo
+
+[local]
+name=local
+baseurl=file:///media CentOS_6.8_Final
+gpgcheck=0
+enabled=1
+
+③：清除之前的YUM仓库缓存
+yum clean all
+
+④建立新的本地YUM仓库缓存
+yum makecache
+
+3：验证本地YUM仓库的可用性,安装MySQL服务程序
+yum install mysql-server
+
+④开启MySQL服务验证程序是否安装成功，并查看其端口号
+service mysqld start     ss -tnl
+
+4：进入MySQL
+mysql
+
+
+
+
+
+构建网络yum仓库
+①：下载repo仓库文件至/etc/yum.repos.d目录下   
+例如wget http://mirrors.aliyun.com/repo/Centos-6.repo
+(yum -y instal epel-release      wget -O epel.repo http://mirrors.aliyun.com/repo/epel-6.repo)
+②：清除之前yum仓库元数据缓存。
+②：直接使用yum工具进行在线装包即可。
+
+1：删除/etc/yum.repos.d目录下的所有仓库配置文件
+cd /etcyum.repos.d   rm -f *
+
+2：拖拽三个文件到/etc/yum.repos.d目录
+拖拽   ls
+
+3：清除YUM缓存
+yum clean all
+
+4：构建网络Yum仓库缓存
+yum makecache
+
+5：验证网络yum仓库搭建效果
+yum -y install gcc  
+
+（gcc是个编译器）
+
+
+
+yum详细指令：
+安装       yum [选项] install 包1 包2....        选项：-y 自动回应 yes
+yum -y install mysql-server php mysql-devel......
+卸载       yum [选项] remove 包1 包2....             -q 静默模式
+yum -y remove vsftpd
+
+更新       yum [选项] update 包1 包2....
+yum update httpd
+检查更新   yum check-update
+查看指定特性（可以是文件） 由哪个程序包提供：
+           yum provides 关键字
+
+清除缓存   yum clean all
+构建缓存   yum makecache
+模糊搜索   yum search 关键字
+yum search mysql-ser*
+查看指定包依赖的包关系
+           yum deplist 包1 包2.....
