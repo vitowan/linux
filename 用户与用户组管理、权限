@@ -1,0 +1,66 @@
+用户是什么？用户的类型
+实现资源分派  认证的过程
+
+uid:用户标识号   gid:组标识号    每个用户创建出来如果不分配组，那属于自身基本组
+①超级用户root  权限特别大（uid=0 gid=0  生产环境建议不要使用）
+②普通用户  （ uid>=500  一般权限系统管理，权限有限）
+③程序用户  （1<=uid<500 服务资源使用 不能登录系统）
+直接打 id 可以得到用户的组别
+
+
+用户的账户文件：/etc/passwd
+[root@vito363 ~]# tail -1 /etc/passwd
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/bash
+上面中x是占位符
+两个27分别为uid编号和gid编号
+/var/lib/mysql是户主目录
+/bin/bash 登录的shell（若为/sbin/nologin 则不能登录）
+
+ /etc/shadow（非常重要，绝对不可泄露）
+  作用：保存用户的帐号、密码、有效期等信息，每一行对应一个用户名的密码和信息
+用户：资源获取标识符，资源分配，安全权限模型的核心要素之一
+密码：来实现用户认证的
+
+************添加用户  命令格式     只能超级用户才用权限操作
+useradd [-u UID] [-g GID] [-d HOME] [-M] [-s] 用户名
+添加用户  命令格式     只能超级用户才用权限操作
+useradd [-u UID] [-g GID] [-d HOME] [-M] [-s] 用户名
+
+[root@vito363 ~]# useradd haha
+[root@vito363 ~]# tail -1 /etc/passwd
+haha:x:889:889::/home/haha:/bin/bash
+
+-u 自定义UID
+[root@vito363 ~]# useradd -u 666 hehe
+[root@vito363 ~]# tail -2 /etc/passwd
+haha:x:889:889::/home/haha:/bin/bash
+hehe:x:666:666::/home/hehe:/bin/bash
+
+-g 自定义GID，前提是这个GID已经存在
+[root@vito363 ~]# user add -g 0 aaa
+-bash: user: command not found
+[root@vito363 ~]# useradd -g 0 aaa
+[root@vito363 ~]# tail -5 /etc/passwd
+jiuye:x:888:0::/home/jiuye:/sbin/nologin
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/bash
+haha:x:889:889::/home/haha:/bin/bash
+hehe:x:666:666::/home/hehe:/bin/bash
+aaa:x:890:0::/home/aaa:/bin/bash
+
+-d 自定义家目录（家目录需事先不存在），需要使用绝对路径
+useradd -d /root/桌面/baba baba
+[root@vito363 ~]# tail -1 /etc/passwd
+baba:x:891:891::/root/桌面/baba:/bin/bash
+
+-M 不要创建用户家目录（系统帐号默认值）
+-s 自定义shell，若没有默认为/bin/bash
+[root@vito363 home]# useradd -M -s /sbin/nologin bbb
+[root@vito363 home]# tail -1 /etc/passwd
+bbb:x:892:892::/home/bbb:/sbin/nologin
+
+[root@vito363 home]# useradd -u 732 -g 0 -s /sbin/nologin uuu
+[root@vito363 home]# tail -1 /etc/passwd
+uuu:x:732:0::/home/uuu:/sbin/nologin
+
+
+
