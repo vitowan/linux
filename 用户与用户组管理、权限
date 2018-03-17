@@ -63,6 +63,192 @@ bbb:x:892:892::/home/bbb:/sbin/nologin
 uuu:x:732:0::/home/uuu:/sbin/nologin
 
 
+***********删除用户的语法
+
+userdel [-r] 用户名
+-r 同时删除用户的家目录（如果不加r，家目录还会存在，需要再用rm删除）
+
+给用户设置密码（超级用户才能有此权限）
+passwd  xxxxxx
+切换用户    su - USERNAME
+
+***********权限管理：针对的是文件
+
+
+*****************修改文件的属主和属组 ：仅管理员可执行，chown，chgrp
+格式：chown [options] UserName[{:|.}GroupName] FILE...
+//只改属主
+[root@vito363 ~]# chown aaa 1.txt
+[root@vito363 ~]# ls -l 1.txt
+-rw-r--r--. 1 aaa root 8 3月  16 08:51 1.txt
+//属主和属组一起改
+[root@vito363 ~]# chown root.haha 1.txt
+[root@vito363 ~]# ls -l 1.txt
+-rw-r--r--. 1 root haha 8 3月  16 08:51 1.txt
+//只改属组
+root@vito363 ~]# chown .hehe 1.txt  //把.换成:也可以
+[root@vito363 ~]# ls -l 1.txt
+-rw-r--r--. 1 root hehe 8 3月  16 08:51 1.txt
+//只改属组(前提是有这个组才可以修改，例如建的属主为hehe的，可把数组设为它的属组如下)
+-rw-r--r--. 1 root root 8 3月  16 08:51 1.txt
+[root@vito363 ~]# chgrp hehe 1.txt 
+[root@vito363 ~]# ls -l 1.txt 
+-rw-r--r--. 1 root hehe 8 3月  16 08:51 1.txt
+//递归修改（把文件里面的文件一次性全修改）
+[root@vito363 ~]# chown -R root:root /home/haha
+
+
+***************修改文件权限：chmod
+owner,group，other 字母表示，分别是 u ,g, o
+属主，属组，其他
+[root@vito363 ~]# ls -l install.log
+-rw-r--r--. 1 root root 46478 3月  15 19:44 install.log
+
+用户的不拥有某位权限，则使用-占位
+---------   第一个表示文件类型  第二个-开始，每三个为一组  分别为属主、属组、其他
+
+格式：
+  操作三类用户的权限：使用8进制形式
+      chmod [-R] OCTAL-MODE（8进制）file ...
+      对链接文件无效，左侧以0补齐
+
+  操作指定类别用户的权限：使用u，g，o，a来赋权，基于=或者+/-来进行
+     u：属主
+     g：属组
+     o：其他
+     a：所有
+     =：操作指定类型用户的权限
+     +/-：操作置顶类型用户的单个权限
+
+
+
+权限：read write execute
+         r   w    x
+文件：
+   r：可以使用内容查看类的命令来显示其相关内容（cat more less tail  head ）
+   w: 可以使用编辑器修改其内容
+   x：可以将其发起一个进程   (发起进程之后文件被称为脚本)
+  目录：
+   r：可以使用ls命令查看目录内容的文件信息
+   w：可以创建、删除文件
+   x：可以使用ls -l命令来查看目录内容的文件信息，并且可以使用cd命令切换此目录为工作目录
+
+ r-x：读和执行的权限  5
+ r--：只读权限   4
+ rw-：读写权限 6
+ -wx:3
+ rwx:7
+ 使用8位数来表示(8进制表示，z^3=8)
+ r：4
+ w：2
+ x：1
+
+[root@vito363 ~]# ls -l 1.txt
+-rw-r--r--. 1 root hehe 8 3月  16 08:51 1.txt
+[root@vito363 ~]# 
+[root@vito363 ~]# chmod u-r 1.txt 
+[root@vito363 ~]# ls -l 1.txt 
+--w-r--r--. 1 root hehe 8 3月  16 08:51 1.txt
+
+[root@vito363 ~]# chmod a-r 1.txt 
+[root@vito363 ~]# ls -l 1.txt 
+--w-------. 1 root hehe 8 3月  16 08:51 1.txt
+
+[root@vito363 ~]# ls -l 1.txt 
+--w-------. 1 root hehe 8 3月  16 08:51 1.txt
+[root@vito363 ~]# chmod 654 1.txt   //进制形式设置的
+[root@vito363 ~]# ls -l 1.txt 
+-rw-r-xr--. 1 root hehe 8 3月  16 08:51 1.txt
+
+
+
+***************归档和压缩
+压缩只能针对于文件，不能针对于目录
+压缩：gzip [-x]  bzip2 [-x]   (x为1到9  压缩级别)
+以gzip方式压缩之后默认文件后缀名为.gz
+以bzip2方式压缩之后默认文件后缀名为.bz2
+压缩之后不会保留源文件
+例如 gzip 1.txt
+du -sh 1.txt.gz 可以查看大小
+
+解压缩 gunzip (或gzip -d)  bunzip2 (或bzip -d)
+[root@vito363 ~]# gunzip yasuo.txt.gz 
+
+
+归档：将多个离散的文件或某个目录进行打包为一个文件，归档会保留源文件。
+归档       tar  选项 归档文件名 源文件名或目录
+-f：使用tar命令必须加，而且放置于最后面
+-c：创建一个新的归档
+-x：释放归档
+-z：使用gzip的方式进行过滤
+-j：使用bzip2的方式进行过滤
+-v：可视化（详细显示出归档或解归档的过程）
+
+
+[root@vito363 桌面]# tar -zcvf t.tar.gz {1..6}.txt
+1.txt
+2.txt
+3.txt
+4.txt
+5.txt
+6.txt
+[root@vito363 桌面]# ls
+{1.6}.txt  2.txt  4.txt  6.txt  backup.gz        t.tar.gz
+1.txt      3.txt  5.txt  baba   libsvxcorelo.so  t.txt
+//生成了上面的t.tar.gz //是一个普通文件
+
+释放归档   tar  选项 归档文件名 -C 目标目录
+[root@vito363 桌面]# tar -xf t.tar.gz -C /home //释放到了home目录下
+
+
+***********8测试网络连通性
+ping命令   ping +ip地址或者域名
+
+
+************安装程序（软件）
+1：程序包管理器（rpm和yum仓库安装）
+rpm 程序包管理负责将外围程序安装过程中帮助注定对应的文件的存放和安装
+只能管理 .rpm的程序包文件
+
+包之间可能存在依赖关系
+①rpm方式安装程序  安装命令
+  rpm -i|--install [选项] 包名
+  -v 显示安装过程中的详细信息
+  -h 以#显示安装进度
+
+例如 rpm -ivh 包的全名（以.rpm结尾的）
+  -U 升级包（如没安装就安装）
+  -F 更新包（没安装放弃安装）
+  --test  (测试能否被安装  try run)
+  --nodeps （忽略依赖关系）
+
+which scp 可以查询scp命令在哪个文件路径里，也可以查其它命令，例如ls
+
+rpm  -q[子选项] 包名关键字
+[root@vito363 Packages]# rpm -q mysql //查询已经安装的rpm包，注意是在光盘里面的packages里面
+mysql-5.1.73-8.el6_8.x86_64
+
+a:已安装的所有软件包 
+[root@vito363 Packages]# rpm -qa | wc -l //查询已安装的所有包的个数
+[root@vito363 Packages]# rpm -qa //查询已安装的所有包
+
+i：查看指定软件的详细信息
+[root@vito363 Packages]# rpm -qi httpd//查询已经安装的包的信息信息，包也是关键词
+
+l：查询软件包的安装目录
+[root@vito363 Packages]# rpm -ql mysql//查询安装的目录
+
+f: 查询文件或目录属于哪个程序包安装生成的
+[root@vito363 Packages]# which scp
+/usr/bin/scp
+[root@vito363 Packages]# rpm -qf /usr/bin/scp
+openssh-clients-5.3p1-117.el6.x86_64 //然后可在安装此包
+
+
+
+
+
+
 ****************yum仓库的搭建和yum方式安装
 构建本地仓库
 ①：创建repo仓库文件（其他repo文件进行转移到其他目录）
@@ -156,3 +342,66 @@ yum update httpd
 yum search mysql-ser*
 查看指定包依赖的包关系
            yum deplist 包1 包2.....
+           
+
+
+*******************源代码编译安装
+1：源代码编译安装的特点和应用场合
+①优点：获得最新的软件版本，及时修复bug
+      据用户需要，灵活制定软件功能
+  
+② 应用场合
+  安装较新版本的应用程序时
+  当前安装的程序无法满足需要时
+  需要为应用程序添加新的功能时
+
+③Tarball封包       tar.gz和 .tar.bz2 格式居多
+软件素材参考：http://sourceforge.net
+
+④完整性校验计算
+MD5校验和，并与官方提供的值相比较，判断是否一致。若不一致，可能
+源码包破损或被人植入程序，需谨慎。
+
+2：源代码编译安装环境
+    需要要支持C/C++程序语言的编译器，如：
+    gcc-4.4.7-17.el6.x86_64
+    gcc-c++-4.4.7-17.el6.x86_64
+make-3.81-23.el6.x86_64  
+安装完后gcc  --version  和make --version查看版本号
+
+3：编译安装的流程
+①：下载源代码安装包文件并解压到指定目录
+②：./configure配置  可以./configure --help查看帮助选项。
+    通过选项传递参数，指定功能特性，安装路径、检查安装环境
+③：开始编译（make命令）  根据makefile文件，构建应用程序。
+④：安装  （make install命令）
+
+
+详细步骤
+1：需要搭建Yum仓库（本地和网络均可）
+
+2：安装gcc和gcc-c++编译器
+yum -y install gcc gcc-c++
+
+3：将源代码包拖拽至系统，然后解压释放到指定的目录
+tar -xf httpd-2.2.17.tar.gz -C /usr/src/
+
+4：进入到源码包的指定路径
+cd /usr/src/httpd-2.2.17/
+
+5：预配置和检查编译环境
+./configure --prefix=/usr/local/httpd --enable-so --enable-rewrite --enable-charset-lite --enable-cgi
+
+6：开始编译
+make
+
+7：编译后安装
+make install
+
+8：启动程序验证编译效果
+cd /usr/local/httpd/bin
+./apachectl start
+ss -tnl
+
+9：在浏览器内验证是否成功
+http://xxx.xxx.xxx.xxx
